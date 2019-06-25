@@ -6,12 +6,28 @@ from flask_login import UserMixin
 def load_user(user_id):
         return User.query.get(int(user_id))
 
-class User(db.Model, UserMixin):
+class Group(db.Model):
         id = db.Column(db.Integer, primary_key=True)
+        groupname = db.Column(db.String(22), unique=True, nullable=False)
+        users = db.relationship('User', backref='group', lazy=True)
+
+        def __repr__(self):
+                return f"Group('{self.groupname}')"
+
+class User(db.Model, UserMixin):
+        # specifying user id
+        id = db.Column(db.Integer, primary_key=True)
+        # account information
         username = db.Column(db.String(22), unique=True, nullable=False)
         email = db.Column(db.String(120), unique=True, nullable=False)
-        image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-        password = db.Column(db.String(60), nullable=False, default='default.jpg')
+        image_file = db.Column(db.String(20), nullable=False, default='defaultpic.png')
+        password = db.Column(db.String(60), nullable=False)
+        # trading information
+        total_energy_traded = db.Column(db.Numeric(12, 2), nullable=False, default=0.00)
+        total_money_earned = db.Column(db.Numeric(12, 2), nullable=False, default=0.00)
+        # relationship to "parent" group
+        group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
+
         posts = db.relationship('Post', backref='author', lazy=True)
 
         def __repr__(self):

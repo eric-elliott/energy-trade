@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-md-8">
+    <h2 class="about-header">Grid</h2>
+    <div class="grid-info"> 
+        <h4 class="grid-header">Prosumers in Grid --- {{ current_user.group }} </h4>
+        <div>{{ current_user.username }}</div>
+    </div>
+    <!-- enable googlemaps later -->
+    <!-- {{googlemap("my_awesome_map", lat=0.23234234, lng=-0.234234234, markers=[(0.12, -0.45345)])}} -->
+</div>
+{% endblock content %}

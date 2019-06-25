@@ -1,11 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from soltrade.models import User
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, DecimalField, SelectField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, InputRequired
+from soltrade.models import User, Group
+from flask_login import current_user
 
 class RegistrationForm(FlaskForm):
     username = StringField('username', validators=[DataRequired(), Length(min=2, max=22)])
     email = StringField('email', validators=[DataRequired(), Email()])
+    group = SelectField('group', choices=[(g.groupname, g.groupname) for g in Group.query.order_by('groupname')], validators=[InputRequired()])
     password = PasswordField('password', validators=[DataRequired()])
     confirm_password = PasswordField('confirm password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField("Register")
@@ -25,3 +28,25 @@ class LoginForm(FlaskForm):
     password = PasswordField('password', validators=[DataRequired()])
     remember = BooleanField('remember me')
     submit = SubmitField("Login")
+
+class UpdateAccountForm(FlaskForm):
+    username = StringField('username', validators=[DataRequired(), Length(min=2, max=22)])
+    email = StringField('email', validators=[DataRequired(), Email()])
+    pic = FileField('set profile picture', validators=[FileAllowed(['jpg', 'png', 'gif'])])
+    submit = SubmitField("Update")
+
+    def validate_username(self, username):
+        if username.data != current_user.username:
+            user = User.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError('This username has been taken --- please select another username.')
+
+    def validate_email(self, email):
+        if email.data != current_user.email: 
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('This email has been taken --- please use another email.')
+
+class BidForm(FlaskForm):
+    bid = DecimalField(0.00, places=2, validators=[DataRequired()])
+    submit = SubmitField("Place Bid")
