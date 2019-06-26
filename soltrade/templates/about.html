@@ -1,7 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="col-md-8">
-    <h2 class="about-header">About</h2>
+
+<div class="grid-header">
+    <h2 class="grid-header-text">About Us</h2>
+</div>
+
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-8 mt-3">
     <h3>Eric Elliott</h3>
         <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
@@ -28,5 +34,10 @@
             Nullam vitae lectus imperdiet, iaculis arcu ut, feugiat arcu. Donec accumsan sit 
             amet elit id vehicula. Nulla id massa orci. Nam auctor suscipit est non convallis.
         </p>
+</div>
+<div class="col-md-4">
+    <img class="img-fluid border border-dark mt-5" src="{{ url_for('static', filename='img/solar_about.jpg') }}">
+</div>
+</div>
 </div>
 {% endblock content %}

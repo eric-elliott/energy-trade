@@ -94,4 +94,4 @@ def account():
 @app.route("/grid", methods=['GET', 'POST'])
 @login_required
 def grid():
-        return render_template('grid.html', title='Grid')
+        return render_template('grid.html', title= current_user.group.groupname + ' Grid')

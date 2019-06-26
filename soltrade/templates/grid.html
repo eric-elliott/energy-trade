@@ -1,12 +1,38 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="col-md-8">
-    <h2 class="about-header">Grid</h2>
-    <div class="grid-info"> 
-        <h4 class="grid-header">Prosumers in Grid --- {{ current_user.group }} </h4>
-        <div>{{ current_user.username }}</div>
-    </div>
-    <!-- enable googlemaps later -->
-    <!-- {{googlemap("my_awesome_map", lat=0.23234234, lng=-0.234234234, markers=[(0.12, -0.45345)])}} -->
+<div class="grid-header">
+    <h2 class="grid-header-text"><em>{{ current_user.group.groupname }}</em> Energy Network</h2>
 </div>
+
+<div class="container-fluid">
+<div class="row">
+    <div class="col-md-4 text-center border-bottom border-right border-dark">
+      <h4 class="mt-1"><b>Members in Network</b></h4>
+      {% for user in current_user.group.users %}
+      <div class="media username-cont">
+        <span class="media-left">
+            <img class="rounded-circle grid-pic" src="{{ url_for('static', filename='img/profilepics/' + user.image_file) }}">
+        </span>
+        <div class="media-body">
+            <div class="media-content ml-2">{{ user.username }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="col text-center border-bottom border-dark">
+        <h4 class="mt-1 border-bottom border-secondary"><b>Available Transactions</b></h4>
+        <div>new bid 1</div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4 text-center border-right border-dark">
+        <h4 class="border-bottom border-secondary"><b>Network Statistics</b></h4>
+        <div>total energy traded: 0.00</div>
+    </div>
+    <div class="col text-center border-right">
+        <h4 class="border-bottom border-secondary"><b>Recent Activity</b></h4>
+    </div>
+</div>
+</div>
+
 {% endblock content %}
