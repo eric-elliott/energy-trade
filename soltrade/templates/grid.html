@@ -20,8 +20,18 @@
       {% endfor %}
     </div>
     <div class="col text-center border-bottom border-dark">
-        <h4 class="mt-1 border-bottom border-secondary"><b>Available Transactions</b></h4>
-        <div>new bid 1</div>
+        <div class="d-flex justify-content-center">
+        <h4 class="mt-1"><b>Available Energy Offers</b></h4>
+        <a class="btn btn-xs ml-3" href="{{ url_for('make_offer') }}">make an offer</a>
+        </div>
+        {% for offer in offers %}
+            {% if offer.active %}
+            <div class="d-flex border-top border-secondary">
+                <div>{{offer.seller.username}}: <b>{{offer.title}}</b> {{offer.date_posted.strftime('%B %d %Y - %H:%M:%S')}} {{offer.energy_offer}}kW for ${{offer.starting_bid}} </div>
+                <a class="ml-2" href="#">place bid?</a>
+            </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </div>
 <div class="row">

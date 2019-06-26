@@ -47,6 +47,8 @@ class UpdateAccountForm(FlaskForm):
             if user:
                 raise ValidationError('This email has been taken --- please use another email.')
 
-class BidForm(FlaskForm):
-    bid = DecimalField(0.00, places=2, validators=[DataRequired()])
-    submit = SubmitField("Place Bid")
+class OfferForm(FlaskForm):
+    title = StringField('title', validators=[DataRequired(), Length(min=2, max=100)])
+    energy_offer = DecimalField('energy offer', places=2, validators=[DataRequired()])
+    starting_bid = DecimalField('starting bid', places=2, validators=[DataRequired()])
+    submit = SubmitField("Post Offer")

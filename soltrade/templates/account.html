@@ -2,7 +2,7 @@
 {% block content %}
 <div class="content-section account">
 
-<div class="media">
+<div class="media border border-dark p-2" style="max-width:350px"">
     <img class="rounded-circle account-img" src="{{ image_file }}">
     <div class="media-body">
     <h2 class="account-heading">{{ current_user.username }}</h2>
@@ -11,7 +11,7 @@
 </div>
 
 <div class="col-md-8">
-<div class="user-stats">
+<div class="user-stats mt-2">
     <u><h4>User Information</h4></u>
     <div>total energy traded: {{current_user.total_energy_traded}} kW</div>
     <div>total money earned: ${{current_user.total_money_earned}}</div>

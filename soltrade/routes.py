@@ -3,9 +3,10 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request
 from soltrade import app, db, bcrypt
-from soltrade.forms import RegistrationForm, LoginForm, UpdateAccountForm
-from soltrade.models import User, Post, Group
+from soltrade.forms import RegistrationForm, LoginForm, UpdateAccountForm, OfferForm
+from soltrade.models import User, Offer, Group
 from flask_login import login_user, current_user, logout_user, login_required
+from sqlalchemy import desc
 from soltrade.microgrid import MicroGrid
 
 num_prosumers = 5
@@ -30,8 +31,6 @@ def register():
         if form.validate_on_submit():
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 # making new user for db
-                print("TESTING")
-                print(form.group.data)
                 user_group = Group.query.filter_by(groupname=form.group.data).first()
                 user = User(username=form.username.data, email=form.email.data, password=hashed_password, group=user_group)
                 db.session.add(user)
@@ -94,4 +93,17 @@ def account():
 @app.route("/grid", methods=['GET', 'POST'])
 @login_required
 def grid():
-        return render_template('grid.html', title= current_user.group.groupname + ' Grid')
+        offers = Offer.query.order_by(desc(Offer.date_posted)).all()
+        return render_template('grid.html', offers=offers, title=current_user.group.groupname + ' Grid')
+
+@app.route("/makeoffer", methods=['GET', 'POST'])
+@login_required
+def make_offer():
+        form = OfferForm()
+        if form.validate_on_submit():
+                offer = Offer(title=form.title.data, energy_offer=form.energy_offer.data, starting_bid=form.starting_bid.data, seller=current_user)
+                db.session.add(offer)
+                db.session.commit()
+                flash('Your offer has been posted!', 'success')
+                return redirect(url_for('grid'))
+        return render_template('makeoffer.html', title='Offer', form=form)

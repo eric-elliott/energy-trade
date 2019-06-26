@@ -7,8 +7,10 @@ def load_user(user_id):
         return User.query.get(int(user_id))
 
 class Group(db.Model):
+        # specifying id of group, along with a name
         id = db.Column(db.Integer, primary_key=True)
         groupname = db.Column(db.String(22), unique=True, nullable=False)
+        # relationship to users in group
         users = db.relationship('User', backref='group', lazy=True)
 
         def __repr__(self):
@@ -25,20 +27,39 @@ class User(db.Model, UserMixin):
         # trading information
         total_energy_traded = db.Column(db.Numeric(12, 2), nullable=False, default=0.00)
         total_money_earned = db.Column(db.Numeric(12, 2), nullable=False, default=0.00)
-        # relationship to "parent" group
+        # relationship to "parent" group, the grid
         group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
-
-        posts = db.relationship('Post', backref='author', lazy=True)
+        # relationship to offers made
+        offers = db.relationship('Offer', backref='seller', lazy=True)
+        # relationship to bids placed
+        bids = db.relationship('Bid', backref='placer', lazy=True)
 
         def __repr__(self):
                 return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
-class Post(db.Model):
+class Offer(db.Model):
+        # specifying id of offer made
         id = db.Column(db.Integer, primary_key=True)
+        # giving the offer a title and date
         title = db.Column(db.String(100), nullable=False)
         date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-        content = db.Column(db.Text, nullable=False)
+        # bidding information
+        energy_offer = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
+        starting_bid = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
+        active = db.Column(db.Boolean, nullable=False, default=True)
+        # relationship to bids placed on offer
+        bids = db.relationship('Bid', backref='offer', lazy=True)
+        # relationship to user who made offer
         user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
         def __repr__(self):
-                return f"Post('{self.title}', '{self.date_posted}'"
+                return f"Offer('{self.title}', '{self.date_posted}', '{self.active}')"
+
+class Bid(db.Model):
+        # specifying id of bid placed
+        id = db.Column(db.Integer, primary_key=True)
+        # amount of money bid
+        amount = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
+        # relationship to parents - offer id being placed on, and user making bid
+        offer_id = db.Column(db.Integer, db.ForeignKey('offer.id'))
+        user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
