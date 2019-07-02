@@ -3,8 +3,8 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request
 from soltrade import app, db, bcrypt
-from soltrade.forms import RegistrationForm, LoginForm, UpdateAccountForm, OfferForm
-from soltrade.models import User, Offer, Group
+from soltrade.forms import RegistrationForm, LoginForm, UpdateAccountForm, OfferForm, BidForm
+from soltrade.models import User, Offer, Group, Bid
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy import desc
 from soltrade.microgrid import MicroGrid
@@ -101,9 +101,35 @@ def grid():
 def make_offer():
         form = OfferForm()
         if form.validate_on_submit():
-                offer = Offer(title=form.title.data, energy_offer=form.energy_offer.data, starting_bid=form.starting_bid.data, seller=current_user)
+                offer = Offer(title=form.title.data, energy_offer=form.energy_offer.data, starting_bid=form.starting_bid.data, 
+                endtime=form.endtime.data, seller=current_user)
+                print("TESTING")
+                print(form.endtime.data)
+                print("TESTING22")
+                offer.top_bid = offer.starting_bid
                 db.session.add(offer)
                 db.session.commit()
                 flash('Your offer has been posted!', 'success')
                 return redirect(url_for('grid'))
         return render_template('makeoffer.html', title='Offer', form=form)
+
+
+@app.route("/placebid/<int:offer_id>", methods=['GET', 'POST'])
+@login_required
+def place_bid(offer_id):
+        form = BidForm()
+        offer = Offer.query.get(offer_id)
+        if form.validate_on_submit():
+                max_bid = 0
+                if len(offer.bids) != 0:
+                        max_bid = max(bid.amount for bid in offer.bids)
+                if form.amount.data < max_bid:
+                        flash('Your bid is less than the top bid -- please place a higher bid.', 'danger')
+                else:
+                        bid = Bid(amount=form.amount.data, offer=offer, placer=current_user)
+                        offer.top_bid = form.amount.data
+                        db.session.add(bid)
+                        db.session.commit()
+                        flash('Your bid has been placed!', 'success')
+                        return redirect(url_for('grid'))
+        return render_template('placebid.html', title='Bid', form=form)

@@ -25,12 +25,24 @@
         <a class="btn btn-xs ml-3" href="{{ url_for('make_offer') }}">make an offer</a>
         </div>
         {% for offer in offers %}
-            {% if offer.active %}
-            <div class="d-flex border-top border-secondary">
-                <div>{{offer.seller.username}}: <b>{{offer.title}}</b> {{offer.date_posted.strftime('%B %d %Y - %H:%M:%S')}} {{offer.energy_offer}}kW for ${{offer.starting_bid}} </div>
-                <a class="ml-2" href="#">place bid?</a>
+        {% if offer.is_active() and offer.user_id != current_user.id %}
+        <div>
+        <div class="media border m-2 border-dark">
+            <img class="offer-img rounded-circle ml-2 mt-2" src="{{ url_for('static', filename='img/profilepics/' + offer.seller.image_file) }}">
+            <div class="media-body">
+                <h5 class="ml-2">{{ offer.title }}, ${{offer.top_bid}}, {{offer.energy_offer}}kW posted on {{offer.date_posted.strftime('%B %d, %Y %H:%M')}} ends at {{offer.endtime}}</h5>
+                <p class="ml-2">bidding history:
+                    <p class="small">
+                    {% for bid in offer.bids %}
+                                <p>{{bid.placer.username}} for ${{bid.amount}}</p>
+                    {% endfor %}
+                    </p>
+                </p>
+                <a class="ml-2" href="{{ url_for('place_bid', offer_id=offer.id) }}">place bid?</a>
             </div>
-            {% endif %}
+        </div>
+        </div>
+        {% endif %}
         {% endfor %}
     </div>
 </div>

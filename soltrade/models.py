@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from soltrade import db, login_manager
 from flask_login import UserMixin
 
@@ -42,24 +42,37 @@ class Offer(db.Model):
         id = db.Column(db.Integer, primary_key=True)
         # giving the offer a title and date
         title = db.Column(db.String(100), nullable=False)
-        date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+        date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
         # bidding information
         energy_offer = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
         starting_bid = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
-        active = db.Column(db.Boolean, nullable=False, default=True)
+        top_bid = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
+        # active_time = db.Column(db.Integer, nullable=False, default=1)
+        endtime = db.Column(db.DateTime, nullable=False, default=datetime.utcnow() + timedelta(days=1))
+        # active = db.Column(db.Boolean, nullable=False, default=True)
         # relationship to bids placed on offer
         bids = db.relationship('Bid', backref='offer', lazy=True)
         # relationship to user who made offer
         user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
         def __repr__(self):
-                return f"Offer('{self.title}', '{self.date_posted}', '{self.active}')"
+                return f"Offer('{self.title}', '{self.date_posted}', '{self.endtime}')"
+
+        def is_active(self):
+                if self.endtime > datetime.utcnow():
+                        return True
+                else:
+                        return False
 
 class Bid(db.Model):
         # specifying id of bid placed
         id = db.Column(db.Integer, primary_key=True)
         # amount of money bid
         amount = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
+        time_placed = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
         # relationship to parents - offer id being placed on, and user making bid
         offer_id = db.Column(db.Integer, db.ForeignKey('offer.id'))
         user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+        def __repr__(self):
+                return f"Bid('{self.user_id}', '{self.amount}', '{self.time_placed}')"

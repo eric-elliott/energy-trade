@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, DecimalField, SelectField
+from wtforms.fields.html5 import DateTimeField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, InputRequired
-from soltrade.models import User, Group
+from soltrade.models import User, Group, Offer
 from flask_login import current_user
 
 class RegistrationForm(FlaskForm):
@@ -49,6 +50,11 @@ class UpdateAccountForm(FlaskForm):
 
 class OfferForm(FlaskForm):
     title = StringField('title', validators=[DataRequired(), Length(min=2, max=100)])
-    energy_offer = DecimalField('energy offer', places=2, validators=[DataRequired()])
-    starting_bid = DecimalField('starting bid', places=2, validators=[DataRequired()])
+    energy_offer = DecimalField('energy offer (kW)', places=2, validators=[DataRequired()])
+    starting_bid = DecimalField('starting bid ($)', places=2, validators=[DataRequired()])
+    endtime = DateTimeField('expiring time (XXXX-mm-dd H:M)', format='%Y-%m-%d %H:%M', validators=[DataRequired()])
     submit = SubmitField("Post Offer")
+
+class BidForm(FlaskForm):
+    amount = DecimalField('amount to bid ($)', places=2, validators=[DataRequired()])
+    submit = SubmitField("Place Bid")
