@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from soltrade import db, login_manager
 from flask_login import UserMixin
 
+# specifying the user loader
 @login_manager.user_loader
 def load_user(user_id):
         return User.query.get(int(user_id))
