@@ -1,5 +1,6 @@
 import os
 import secrets
+from random import randint
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request
 from soltrade import app, db, bcrypt
@@ -32,7 +33,7 @@ def register():
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 # making new user for db
                 user_group = Group.query.filter_by(groupname=form.group.data).first()
-                user = User(username=form.username.data, email=form.email.data, password=hashed_password, group=user_group)
+                user = User(username=form.username.data, email=form.email.data, password=hashed_password, group=user_group,loc=randint(1000, 9999))
                 db.session.add(user)
                 db.session.commit()
                 flash(f'An account was created for {form.username.data} --- you can now log in!', 'success')
@@ -103,9 +104,7 @@ def make_offer():
         if form.validate_on_submit():
                 offer = Offer(title=form.title.data, energy_offer=form.energy_offer.data, starting_bid=form.starting_bid.data, 
                 endtime=form.endtime.data, seller=current_user)
-                print("TESTING")
                 print(form.endtime.data)
-                print("TESTING22")
                 offer.top_bid = offer.starting_bid
                 db.session.add(offer)
                 db.session.commit()
