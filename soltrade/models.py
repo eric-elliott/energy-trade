@@ -36,9 +36,10 @@ class User(db.Model, UserMixin):
         bids = db.relationship('Bid', backref='placer', lazy=True)
         # setting grid location
         loc = db.Column(db.Integer, nullable=False, default=1111)
+        bus = db.Column(db.Integer, nullable=False, default=-1)
 
         def __repr__(self):
-                return f"User('{self.username}', '{self.email}', '{self.image_file}')"
+                return f"User('{self.username}', '{self.email}', '{self.id}')"
 
 class Offer(db.Model):
         # specifying id of offer made

@@ -3,21 +3,23 @@ import secrets
 from random import randint
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request
-from soltrade import app, db, bcrypt
+from soltrade import app, db, bcrypt, powergrid
 from soltrade.forms import RegistrationForm, LoginForm, UpdateAccountForm, OfferForm, BidForm
 from soltrade.models import User, Offer, Group, Bid
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy import desc
-from soltrade.microgrid import MicroGrid
+# from soltrade.microgrid import MicroGrid
+from soltrade.powergrid import PowerGrid
 
-num_prosumers = 5
-internal_price = 4
-external_price = 6
-microgrid = MicroGrid(num_prosumers, internal_price, external_price)
+# num_prosumers = 5
+# internal_price = 4
+# external_price = 6
+# microgrid = MicroGrid(num_prosumers, internal_price, external_price)
 
 @app.route("/")
 @app.route("/home")
 def home():
+        print(powergrid)
         return render_template('home.html')
 
 @app.route("/about")
@@ -33,7 +35,9 @@ def register():
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 # making new user for db
                 user_group = Group.query.filter_by(groupname=form.group.data).first()
-                user = User(username=form.username.data, email=form.email.data, password=hashed_password, group=user_group,loc=randint(1000, 9999))
+                user = User(username=form.username.data, email=form.email.data, password=hashed_password, group=user_group,
+                        loc=randint(1000, 9999))
+                powergrid.add_user(form.username.data)
                 db.session.add(user)
                 db.session.commit()
                 flash(f'An account was created for {form.username.data} --- you can now log in!', 'success')
@@ -102,14 +106,19 @@ def grid():
 def make_offer():
         form = OfferForm()
         if form.validate_on_submit():
-                offer = Offer(title=form.title.data, energy_offer=form.energy_offer.data, starting_bid=form.starting_bid.data, 
-                endtime=form.endtime.data, seller=current_user)
-                print(form.endtime.data)
-                offer.top_bid = offer.starting_bid
-                db.session.add(offer)
-                db.session.commit()
-                flash('Your offer has been posted!', 'success')
-                return redirect(url_for('grid'))
+                is_violated = powergrid.check_transaction(form.energy_offer.data, current_user.username)
+                if is_violated:
+                        flash('The power grid cannot process your current request.', 'danger')
+                        return redirect(url_for('grid'))
+                else:
+                        offer = Offer(title=form.title.data, energy_offer=form.energy_offer.data, starting_bid=form.starting_bid.data, 
+                        endtime=form.endtime.data, seller=current_user)
+                        print(form.endtime.data)
+                        offer.top_bid = offer.starting_bid
+                        db.session.add(offer)
+                        db.session.commit()
+                        flash('Your offer has been posted!', 'success')
+                        return redirect(url_for('grid'))
         return render_template('makeoffer.html', title='Offer', form=form)
 
 
@@ -123,7 +132,7 @@ def place_bid(offer_id):
                 if len(offer.bids) != 0:
                         max_bid = max(bid.amount for bid in offer.bids)
                 if form.amount.data < max_bid:
-                        flash('Your bid is less than the top bid -- please place a higher bid.', 'danger')
+                        flash('Your bid is less than the top bid — please place a higher bid.', 'danger')
                 else:
                         bid = Bid(amount=form.amount.data, offer=offer, placer=current_user)
                         offer.top_bid = form.amount.data
