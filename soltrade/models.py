@@ -32,11 +32,8 @@ class User(db.Model, UserMixin):
         group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
         # relationship to offers made
         offers = db.relationship('Offer', backref='seller', lazy=True)
-        # relationship to bids placed
-        bids = db.relationship('Bid', backref='placer', lazy=True)
-        # setting grid location
-        loc = db.Column(db.Integer, nullable=False, default=1111)
-        bus = db.Column(db.Integer, nullable=False, default=-1)
+        # relationship to request placed
+        requests = db.relationship('Request', backref='placer', lazy=True)
 
         def __repr__(self):
                 return f"User('{self.username}', '{self.email}', '{self.id}')"
@@ -44,39 +41,28 @@ class User(db.Model, UserMixin):
 class Offer(db.Model):
         # specifying id of offer made
         id = db.Column(db.Integer, primary_key=True)
-        # giving the offer a title and date
-        title = db.Column(db.String(100), nullable=False)
-        date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-        # bidding information
+        # energy offering
         energy_offer = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
-        starting_bid = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
-        top_bid = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
-        # active_time = db.Column(db.Integer, nullable=False, default=1)
-        endtime = db.Column(db.DateTime, nullable=False, default=datetime.utcnow() + timedelta(days=1))
-        # active = db.Column(db.Boolean, nullable=False, default=True)
-        # relationship to bids placed on offer
-        bids = db.relationship('Bid', backref='offer', lazy=True)
+        # suggested pricing
+        suggested_price =  db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
+        # boolean to track if offer is active
+        active = db.Column(db.Boolean, unique=False, default=True)
         # relationship to user who made offer
         user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
         def __repr__(self):
                 return f"Offer('{self.title}', '{self.date_posted}', '{self.endtime}')"
 
-        def is_active(self):
-                if self.endtime > datetime.utcnow():
-                        return True
-                else:
-                        return False
-
-class Bid(db.Model):
-        # specifying id of bid placed
+class Request(db.Model):
+        # specifying id of request placed
         id = db.Column(db.Integer, primary_key=True)
-        # amount of money bid
-        amount = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
-        time_placed = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-        # relationship to parents - offer id being placed on, and user making bid
-        offer_id = db.Column(db.Integer, db.ForeignKey('offer.id'))
+        # amount of energy requested
+        energy_requested = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
+        # amount willing to pay
+        payment = db.Column(db.Numeric(10, 2), nullable=False, default=0.00)
+        # approved = db.Column(db.Boolean, unique=False, default=True)
+        # relationship to parent - user making request
         user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
         def __repr__(self):
-                return f"Bid('{self.user_id}', '{self.amount}', '{self.time_placed}')"
+                return f"Request('{self.user_id}', '{self.energy_requested}')"

@@ -1,5 +1,4 @@
 from soltrade import app
 
 if __name__ == '__main__':
-    # powergrid.plot_grid()
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)

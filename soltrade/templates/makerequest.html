@@ -5,31 +5,31 @@
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Make Offer</legend>
+                <legend class="border-bottom mb-4">Make Request</legend>
                 <div class="form-group">
-                    {{ form.title.label(class="form-control-label") }}
-                    {% if form.title.errors %}
-                        {{ form.title(class="form-control is-invalid") }}
+                    {{ form.energy_requested.label(class="form-control-label") }}
+                    {% if form.energy_requested.errors %}
+                        {{ form.energy_requested(class="form-control is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.title.errors %}
+                            {% for error in form.energy_requested.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.title(class="form-control") }}
+                        {{ form.energy_requested(class="form-control") }}
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    {{ form.energy_offer.label(class="form-control-label") }}
-                    {% if form.energy_offer.errors %}
-                        {{ form.energy_offer(class="form-control is-invalid") }}
+                    {{ form.payment.label(class="form-control-label") }}
+                    {% if form.payment.errors %}
+                        {{ form.payment(class="form-control is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.energy_offer.errors %}
+                            {% for error in form.payment.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.energy_offer(class="form-control") }}
+                        {{ form.payment(class="form-control") }}
                     {% endif %}
                 </div>
             </fieldset>

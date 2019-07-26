@@ -50,11 +50,16 @@ class UpdateAccountForm(FlaskForm):
 
 class OfferForm(FlaskForm):
     title = StringField('title', validators=[DataRequired(), Length(min=2, max=100)])
-    energy_offer = DecimalField('energy offer (kW)', places=2, validators=[DataRequired()])
-    starting_bid = DecimalField('starting bid ($)', places=2, validators=[DataRequired()])
-    endtime = DateTimeField('expiring time (XXXX-mm-dd H:M)', format='%Y-%m-%d %H:%M', validators=[DataRequired()])
+    energy_offer = DecimalField('energy offer (kWh)', places=2, validators=[DataRequired()])
     submit = SubmitField("Post Offer")
 
-class BidForm(FlaskForm):
-    amount = DecimalField('amount to bid ($)', places=2, validators=[DataRequired()])
-    submit = SubmitField("Place Bid")
+    def validate_offer():
+        if current_user.offers != None:
+            raise ValidationError("You've already made an offer today!")
+
+
+
+class RequestForm(FlaskForm):
+    energy_requested = DecimalField('amount of energy requested (kWh)', places=2, validators=[DataRequired()])
+    payment = DecimalField('maximum amount willing to pay ($)', places=2, validators=[DataRequired()])
+    submit = SubmitField("Make Request")

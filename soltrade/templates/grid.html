@@ -16,43 +16,32 @@
         <div class="media-body">
             <div class="media-content ml-2">{{ user.username }}</div>
         </div>
+        <div class="media-body">
+            last active: 7/12/19
+        </div>
       </div>
       {% endfor %}
     </div>
     <div class="col text-center border-bottom border-dark">
         <div class="d-flex justify-content-center">
-        <h4 class="mt-1"><b>Available Energy Offers</b></h4>
-        <a class="btn btn-xs ml-3" href="{{ url_for('make_offer') }}">make an offer</a>
+        <h4 class="border border-dark mt-1"><b>Current Available Energy in Grid: 32.41kW</h4>
         </div>
-        {% for offer in offers %}
-        {% if offer.is_active() and offer.user_id != current_user.id %}
-        <div>
-        <div class="media border m-2 border-dark">
-            <img class="offer-img rounded-circle ml-2 mt-2" src="{{ url_for('static', filename='img/profilepics/' + offer.seller.image_file) }}">
-            <div class="media-body">
-                <h5 class="ml-2">{{ offer.title }}, ${{offer.top_bid}}, {{offer.energy_offer}}kW posted on {{offer.date_posted.strftime('%B %d, %Y %H:%M')}} ends at {{offer.endtime}}</h5>
-                <p class="ml-2">bidding history:
-                    <p class="small">
-                    {% for bid in offer.bids %}
-                                <p>{{bid.placer.username}} for ${{bid.amount}}</p>
-                    {% endfor %}
-                    </p>
-                </p>
-                <a class="ml-2" href="{{ url_for('place_bid', offer_id=offer.id) }}">place bid?</a>
-            </div>
-        </div>
-        </div>
-        {% endif %}
-        {% endfor %}
+        <a class="btn btn-mybutton ml-3" href="{{ url_for('make_offer') }}">make an offer</a>
+        <a class="btn btn-mybutton ml-3" href="{{ url_for('make_request') }}">make a request</a>
+        <h6 class="mt-3">energy generated yesterday: 25.67kW</h6>
     </div>
 </div>
 <div class="row">
     <div class="col-md-4 text-center border-right border-dark">
-        <h4 class="border-bottom border-secondary"><b>Network Statistics</b></h4>
-        <div>total energy traded: 0.00</div>
+        <h4 class="border-bottom border-secondary"><b>Week Statistics</b></h4>
+        <div>total energy purchased: 434.53kW</div>
+        <div>total energy sent: 302.10kW</div>
     </div>
     <div class="col text-center border-right">
-        <h4 class="border-bottom border-secondary"><b>Recent Activity</b></h4>
+        <h4 class="border-bottom border-secondary"><b>Request History</b></h4>
+        <div>Offered: 12.5kW on 7/11/19</div>
+        <div>Requested: 5.67kW on 7/10/19</div>
+        <div>Offered: 14.32kW on 7/8/19</div>
     </div>
 </div>
 </div>
